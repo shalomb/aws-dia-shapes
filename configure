@@ -1,27 +1,44 @@
 #!/bin/bash
 
-URL="https://media.amazonwebservices.com/AWS-Design/Arch-Center/16.2.22_Update/AWS_Simple_Icons_EPS-SVG_v16.2.22.zip"
+set -eu
 
-echo "JUST DO IT!! (waiting for enter keystroke)"
-read
+function assert_available {
+  if ! type -P "$1" &>/dev/null; then
+    echo "$1 is not available on this system." >&2
+    exit 3
+  fi
+}
 
-wget -O icons.zip $URL
-unzip icons.zip
+assert_available convert
+assert_available convert-im6
+assert_available make
+assert_available rsvg-convert
+assert_available unzip
+assert_available wget
 
-mkdir svg
+# Refer to https://aws.amazon.com/architecture/icons/ for latest distribution
+# of the AWS Simple Icons zip file
+AWS_ICON_ZIP_URLS+=(
+  "https://media.amazonwebservices.com/AWS-Design/Arch-Center/16.2.22_Update/AWS_Simple_Icons_EPS-SVG_v16.2.22.zip"
+  "https://media.amazonwebservices.com/AWS-Design/Arch-Center/17.1.19_Update/AWS_Simple_Icons_EPS-SVG_v17.1.19.zip"
+)
 
-find -name '*.svg' -exec cp {} svg/ \;
-find -name '* *' -print0 | xargs -0 rm
+mkdir -p tmp/outputs tmp/shapes tmp/svg
+for url in "${AWS_ICON_ZIP_URLS[@]}"; do
+  wget  -c -O  "${url##*/}" "$url"
+  unzip -q -jo "${url##*/}" '[A-Za-z0-9]*.svg' -d tmp/svg/
+done
 
-make
-
-echo "All done"
-echo "Copy .output/shapes.sheet to ~/.dia/sheets/"
-echo "Copy .output/shapes/* to ~/.dia/shapes/"
-echo
-echo "Yesterday you said tomorrow..."
-echo "Break here (ctrl-c) to do it manually or press enter to JUST DO IT!"
-read
-
-cp -v .outputs/shapes.sheet ~/.dia/sheets/AWS.sheet
-cp -v .outputs/shapes/* ~/.dia/shapes/
+if [[ ${1:-} = build ]]; then
+  make
+  make install
+  echo "'make install' completed successfully ($?). Please restart dia."
+else
+  cat <<EOF
+  $0 has downloaded the AWS Simple Icons.
+  
+  Please run 'make', 'make install', etc now
+  or run '$0 build' to complete these automatically
+  
+EOF
+fi
