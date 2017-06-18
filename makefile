@@ -1,34 +1,33 @@
 
 
-.DEFAULT : __generate__
-.PHONY : __generate__ __clean__
+.DEFAULT : build
+.PHONY : build clean
 .SUFFIXES :
 .SECONDARY :
 .POSIX :
 .SILENT :
 
 
-_svg_inputs_root := $(abspath ./svg)
+_svg_inputs_root := $(abspath ./tmp/svg)
 _svg_inputs := $(wildcard $(_svg_inputs_root)/*.svg)
 
 _eps_inputs_root := $(abspath ./eps)
 _eps_inputs := $(wildcard $(_eps_inputs_root)/*.eps)
 
-_outputs_root := $(abspath ./.outputs)
+_outputs_root := $(abspath ./tmp/outputs)
 _shapes_outputs_root := $(_outputs_root)/shapes
 _shapes_sheet_output := $(_outputs_root)/shapes.sheet
 
 
-__generate__ : $(_outputs_root)
+build : $(_outputs_root)
 
-__clean__ :
+clean :
 	test ! -e $(_outputs_root) || rm -R $(_outputs_root)
-
 
 $(patsubst $(_svg_inputs_root)/%.svg, $(_shapes_outputs_root)/%.svg, $(_svg_inputs)) \
 		: $(_shapes_outputs_root)/%.svg \
 		: $(_svg_inputs_root)/%.svg makefile
-	$(info [xx] [make] $(strip $(patsubst $(_outputs_root)/%, %, $(@))))
+	$(info [xx] [sanitize] $(strip $(patsubst $(_outputs_root)/%, %, $(@))))
 	test ! -e $(@) || rm $(@)
 	test -e $(@D) || mkdir -p $(@D)
 	cp -T $(<) $(@)
@@ -40,30 +39,13 @@ $(patsubst $(_svg_inputs_root)/%.svg, $(_shapes_outputs_root)/%.svg, $(_svg_inpu
 	| cat >$(@)1
 	mv -T $(@)1 $(@)
 
-#$(patsubst $(_svg_inputs_root)/%.svg, $(_shapes_outputs_root)/%.svg, $(_svg_inputs)) \
-#		: $(_shapes_outputs_root)/%.svg \
-#		: $(_eps_inputs_root)/%.eps makefile
-#	$(info [xx] [make] $(strip $(patsubst $(_outputs_root)/%, %, $(@))))
-#	test ! -e $(@) || rm $(@)
-#	test -e $(@D) || mkdir -p $(@D)
-#	#a# epstopdf $(<) --outfile=$(@).pdf
-#	#a# inkscape --export-plain-svg $(@) $(@).pdf
-#	#b# pstoedit -f plot-svg $(<) $(@)
-#	cat <$(@) \
-#	| tr '\t\n\r' ' ' \
-#	| tr -s ' ' \
-#	| sed -E -e 's!( *)<!\n<!g' -e 's!>( *)!>\n!g' \
-#	| sed -E -e '/^$$/d' \
-#	| cat >$(@)1
-#	mv -T $(@)1 $(@)
-
 $(_outputs_root) : $(patsubst $(_svg_inputs_root)/%.svg, $(_shapes_outputs_root)/%.svg, $(_svg_inputs))
 
 
 $(patsubst $(_svg_inputs_root)/%.svg, $(_shapes_outputs_root)/%.shape, $(_svg_inputs)) \
 		: $(_shapes_outputs_root)/%.shape \
 		: $(_shapes_outputs_root)/%.svg makefile
-	$(info [xx] [make] $(strip $(patsubst $(_outputs_root)/%, %, $(@))))
+	$(info [xx] [create_shape] $(strip $(patsubst $(_outputs_root)/%, %, $(@))))
 	test ! -e $(@) || rm $(@)
 	test -e $(@D) || mkdir -p $(@D)
 	{ \
@@ -99,7 +81,7 @@ $(_outputs_root) : $(patsubst $(_svg_inputs_root)/%.svg, $(_shapes_outputs_root)
 $(patsubst $(_svg_inputs_root)/%.svg, $(_shapes_outputs_root)/%.png, $(_svg_inputs)) \
 		: $(_shapes_outputs_root)/%.png \
 		: $(_shapes_outputs_root)/%.svg makefile
-	$(info [xx] [make] $(strip $(patsubst $(_outputs_root)/%, %, $(@))))
+	$(info [xx] [create_png] $(strip $(patsubst $(_outputs_root)/%, %, $(@))))
 	test ! -e $(@) || rm $(@)
 	test -e $(@D) || mkdir -p $(@D)
 	convert -density 600 -resize 22x22 $(<) $(@)
@@ -108,7 +90,7 @@ $(_outputs_root) : $(patsubst $(_svg_inputs_root)/%.svg, $(_shapes_outputs_root)
 
 
 $(_shapes_sheet_output) : $(_svg_inputs) makefile
-	$(info [xx] [make] $(strip $(patsubst $(_outputs_root)/%, %, $(@))))
+	$(info [xx] [create_sheet] $(strip $(patsubst $(_outputs_root)/%, %, $(@))))
 	test ! -e $(@) || rm $(@)
 	test -e $(@D) || mkdir -p $(@D)
 	{ \
@@ -130,3 +112,12 @@ $(_shapes_sheet_output) : $(_svg_inputs) makefile
 	} >$(@)
 
 $(_outputs_root) : $(_shapes_sheet_output)
+
+prepare:
+	./configure
+
+install:
+	mkdir -p ~/.dia/shapes ~/.dia/sheets
+	cp -a $(_outputs_root)/shapes.sheet ~/.dia/sheets/AWS.sheet
+	cp -a $(_outputs_root)/shapes/*     ~/.dia/shapes/
+
