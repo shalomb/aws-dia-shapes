@@ -98,7 +98,7 @@ $(_shapes_sheet_output) : $(_svg_inputs) makefile
 		echo '' ; \
 		echo '<sheet xmlns="http://www.lysator.liu.se/~alla/dia/dia-sheet-ns">' ; \
 		echo '	' ; \
-		echo '	<name>AWS shapes</name>' ; \
+		echo '	<name>AWS Simple Icons</name>' ; \
 		echo '	<description>AWS shapes</description>' ; \
 		echo '	' ; \
 		echo '	<contents>' ; \

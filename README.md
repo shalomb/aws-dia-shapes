@@ -1,6 +1,6 @@
 # AWS Simple Icons for dia
-This provides `AWS Shapes` for [Dia](https://wiki.gnome.org/Apps/Dia) which 
-programatically creates icons from the iconset provided by AWS at
+This provides `AWS Simple Icons` for [Dia](https://wiki.gnome.org/Apps/Dia) which 
+programatically creates icons from the iconset provided by
 [AWS Simple Icons for Architecture Diagrams](https://aws.amazon.com/architecture/icons/).
 
 This is a fork and slight rewrite of [pieterlange/aws-dia-shapes](https://github.com/pieterlange/aws-dia-shapes)
@@ -10,7 +10,7 @@ This fork/rewrite takes my work of figuring out dependencies, reverse-engineerin
 and ironing out issues with the original [./do-it.sh](https://github.com/pieterlange/aws-dia-shapes/blob/master/doit.sh)
 script and so should produce a more reliable build.
 
-The `AWS shapes` shape sheet is generated from a template (see [makefile](https://github.com/shalomb/aws-dia-shapes/blob/master/makefile#L51))
+The `AWS Simple Icons` shape sheet is generated from a template (see [makefile](https://github.com/shalomb/aws-dia-shapes/blob/master/makefile#L51))
 and is currently  installed into `~/.dia/{shapes,sheets}`.
 No system install is supported but PRs welcome (see TODO list below).
 
@@ -27,7 +27,7 @@ No system install is supported but PRs welcome (see TODO list below).
 
 ## Usage
 
-Build and install the `AWS Shapes`
+Build and install the `AWS Simple Icons`
 ```bash
   git clone https://github.com/shalomb/aws-dia-shapes.git
   cd aws-dia-shapes
@@ -38,8 +38,7 @@ Build and install the `AWS Shapes`
 ```
 
 _NOTE_ : A restart of dia may be needed once the above steps are complete. A
-         new sheet named `AWS Shapes` should be present under the sheets menu
-         under `Other sheets >`.
+         new sheet should now be present at `Other sheets > AWS Simple Icons`.
 
 ## Licence
 
